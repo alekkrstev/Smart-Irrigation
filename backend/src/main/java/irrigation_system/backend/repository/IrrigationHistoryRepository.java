@@ -11,4 +11,6 @@ import java.util.List;
 public interface IrrigationHistoryRepository extends JpaRepository<IrrigationHistory, Long> {
 
     List<IrrigationHistory> findAllByParcel(Parcel parcel);
+        List<IrrigationHistory> findByParcelIdOrderByIrrigationDateDescIrrigationTimeDesc(Long parcelId);
+
 }

@@ -1,0 +1,126 @@
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700;1,800;1,900&family=Outfit:wght@300;400;500;600;700&display=swap");
+
+:root {
+  --earth: #1a2e1a;
+  --forest: #2d5a27;
+  --leaf: #4a8c3f;
+  --sage: #7ab56e;
+  --mist: #c8dfc4;
+  --cream: #f5f0e8;
+  --cream2: #ede8df;
+  --sun: #e8b84b;
+  --clay: #c4784a;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  font-family: "Outfit", sans-serif;
+  background: var(--cream);
+  color: var(--earth);
+  overflow-x: hidden;
+  cursor: auto;
+}
+
+/* Animations */
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+@keyframes bob1 {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+@keyframes bob2 {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-11px);
+  }
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes barGrow {
+  from {
+    height: 0%;
+  }
+  to {
+    height: var(--h);
+  }
+}
+
+.chip-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--sage);
+  animation: blink 2s infinite;
+  display: inline-block;
+}
+.fw-1 {
+  animation: bob1 5s ease-in-out infinite;
+}
+.fw-2 {
+  animation: bob2 6s 1s ease-in-out infinite;
+}
+.fw-3 {
+  animation: bob1 7s 0.5s ease-in-out infinite;
+}
+
+/* Wbar fill transition */
+.wbar-fill {
+  transition: width 1.8s 2s ease;
+}
+
+/* Bar chart items */
+.bc-bar {
+  transition: height 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}

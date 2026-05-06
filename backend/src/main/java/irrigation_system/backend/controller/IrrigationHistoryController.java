@@ -5,8 +5,12 @@ import irrigation_system.backend.dto.IrrigationHistoryResponse;
 import irrigation_system.backend.mapper.DtoMapper;
 import irrigation_system.backend.model.IrrigationHistory;
 import irrigation_system.backend.service.IrrigationHistoryService;
+
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @RestController
@@ -31,14 +36,39 @@ public class IrrigationHistoryController {
             @PathVariable Long parcelId,
             @RequestBody AddIrrigationRequest request
     ) {
-        IrrigationHistory history = irrigationHistoryService.addManualIrrigation(parcelId, request.waterAmount());
-        return ResponseEntity.status(HttpStatus.CREATED).body(DtoMapper.toIrrigationHistoryResponse(history));
+        IrrigationHistory history = irrigationHistoryService.addManualIrrigation(
+                parcelId,
+                request.waterAmount()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(DtoMapper.toIrrigationHistoryResponse(history));
     }
 
     @GetMapping("/parcel/{parcelId}")
-    public ResponseEntity<List<IrrigationHistoryResponse>> getHistoryByParcel(@PathVariable Long parcelId) {
-        return ResponseEntity.ok(irrigationHistoryService.getHistoryByParcel(parcelId).stream()
-                .map(DtoMapper::toIrrigationHistoryResponse)
-                .toList());
+    public ResponseEntity<List<IrrigationHistoryResponse>> getHistoryByParcel(
+            @PathVariable Long parcelId
+    ) {
+        return ResponseEntity.ok(
+                irrigationHistoryService.getHistoryByParcel(parcelId)
+                        .stream()
+                        .map(DtoMapper::toIrrigationHistoryResponse)
+                        .toList()
+        );
     }
+    @GetMapping("/parcel/{parcelId}/export")
+public ResponseEntity<byte[]> exportHistoryCsvByParcel(@PathVariable Long parcelId) {
+    String csv = irrigationHistoryService.exportHistoryCsvByParcel(parcelId);
+
+    byte[] csvBytes = csv.getBytes(StandardCharsets.UTF_8);
+
+    return ResponseEntity.ok()
+            .header(
+                    HttpHeaders.CONTENT_DISPOSITION,
+                    "attachment; filename=irrigation-history-parcel-" + parcelId + ".csv"
+            )
+            .contentType(MediaType.parseMediaType("text/csv"))
+            .body(csvBytes);
+}
 }

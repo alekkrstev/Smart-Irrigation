@@ -15,7 +15,11 @@ public final class DtoMapper {
     }
 
     public static UserResponse toUserResponse(User user) {
-        return new UserResponse(user.getId(), user.getName(), user.getEmail());
+        return new UserResponse(
+                user.getId(),
+                user.getName(),
+                user.getEmail()
+        );
     }
 
     public static ParcelResponse toParcelResponse(Parcel parcel) {
@@ -26,9 +30,12 @@ public final class DtoMapper {
                 parcel.getName(),
                 parcel.getLocation(),
                 parcel.getSize(),
+                parcel.getSoilType(),
+                parcel.getIrrigationSystem(),
                 parcel.getCropType(),
                 parcel.getLastIrrigation(),
                 parcel.getNotes(),
+                parcel.getPriority(),
                 userId
         );
     }

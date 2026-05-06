@@ -7,6 +7,6 @@ import java.util.List;
 public interface IrrigationHistoryService {
 
     IrrigationHistory addManualIrrigation(Long parcelId, double waterAmount);
-
     List<IrrigationHistory> getHistoryByParcel(Long parcelId);
+    String exportHistoryCsvByParcel(Long parcelId);
 }
