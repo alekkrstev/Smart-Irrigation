@@ -1,6 +1,33 @@
+import { useState } from "react";
 import SectionTitle from "./SectionTitle";
 
 function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [filtered, setFiltered] = useState(null);
+
+  const handleFilter = () => {
+    if (!from || !to) return;
+
+    const filteredData = history.filter((row) => {
+      if (!row.irrigationDate) return false;
+
+      const rowDate = row.irrigationDate.slice(0, 10);
+
+      return rowDate >= from && rowDate <= to;
+    });
+
+    setFiltered(filteredData);
+  };
+
+  const handleClear = () => {
+    setFrom("");
+    setTo("");
+    setFiltered(null);
+  };
+
+  const displayHistory = filtered ?? history;
+
   return (
     <div className="card fade-in fade-in-3" style={{ padding: "20px 22px" }}>
       <div
@@ -33,7 +60,88 @@ function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
         </button>
       </div>
 
-      {history.length === 0 ? (
+      {/* Филтер по датум */}
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 8,
+          marginBottom: 14,
+          flexWrap: "wrap",
+          padding: "12px 14px",
+          background: "var(--green-50)",
+          borderRadius: "var(--r)",
+          border: "1px solid var(--border)",
+        }}
+      >
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: "var(--text-muted)",
+          }}
+        >
+          📅 Од:
+        </span>
+
+        <input
+          type="date"
+          value={from}
+          onChange={(e) => setFrom(e.target.value)}
+          style={dateInputStyle}
+        />
+
+        <span
+          style={{
+            fontSize: 12,
+            fontWeight: 700,
+            color: "var(--text-muted)",
+          }}
+        >
+          До:
+        </span>
+
+        <input
+          type="date"
+          value={to}
+          onChange={(e) => setTo(e.target.value)}
+          style={dateInputStyle}
+        />
+
+        <button
+          className="btn-primary"
+          onClick={handleFilter}
+          disabled={!from || !to}
+          style={{ fontSize: 11, padding: "6px 14px" }}
+        >
+          Пребарај
+        </button>
+
+        {filtered && (
+          <button
+            className="btn-ghost"
+            onClick={handleClear}
+            style={{ fontSize: 11, padding: "6px 10px" }}
+          >
+            ✕ Исчисти
+          </button>
+        )}
+      </div>
+
+      {filtered && (
+        <div
+          style={{
+            fontSize: 12,
+            color: "var(--text-muted)",
+            marginBottom: 10,
+            fontWeight: 600,
+          }}
+        >
+          Прикажани {filtered.length} записи · {from} → {to}
+        </div>
+      )}
+
+      {displayHistory.length === 0 ? (
         <div
           style={{
             fontSize: 13,
@@ -42,7 +150,9 @@ function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
             padding: 16,
           }}
         >
-          Нема евидентирани наводнувања.
+          {filtered
+            ? "Нема записи за избраниот период."
+            : "Нема евидентирани наводнувања."}
         </div>
       ) : (
         <div
@@ -76,7 +186,7 @@ function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
             </thead>
 
             <tbody>
-              {history
+              {displayHistory
                 .slice()
                 .reverse()
                 .map((row) => (
@@ -110,7 +220,7 @@ function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
                         color: "var(--text-muted)",
                       }}
                     >
-                      {Number(row.waterAmount).toLocaleString()} л
+                      {Number(row.waterAmount || 0).toLocaleString()} л
                     </td>
 
                     <td>
@@ -125,5 +235,15 @@ function HistoryCard({ history, fmtDate, fmtTime, onExport }) {
     </div>
   );
 }
+
+const dateInputStyle = {
+  padding: "5px 9px",
+  borderRadius: 7,
+  border: "1px solid var(--border)",
+  fontSize: 12,
+  color: "var(--text)",
+  fontFamily: "Outfit, sans-serif",
+  outline: "none",
+};
 
 export default HistoryCard;

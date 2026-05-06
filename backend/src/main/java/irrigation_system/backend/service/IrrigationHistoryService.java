@@ -2,6 +2,7 @@ package irrigation_system.backend.service;
 
 import irrigation_system.backend.model.IrrigationHistory;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface IrrigationHistoryService {

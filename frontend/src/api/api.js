@@ -7,11 +7,14 @@ async function request(method, path, body) {
     headers: { "Content-Type": "application/json" },
     body: body ? JSON.stringify(body) : undefined,
   });
+
   if (!res.ok) {
     const err = await res.json().catch(() => ({ message: res.statusText }));
     throw new Error(err.message || `HTTP ${res.status}`);
   }
+
   if (res.status === 204) return null;
+
   return res.json();
 }
 
@@ -73,14 +76,19 @@ export const historyApi = {
 
 // ─── Irrigation Schedules ─────────────────────────────────────────────────────
 export const scheduleApi = {
+  /** GET /api/schedules/parcel/{parcelId} */
   getByParcel: (parcelId) => request("GET", `/schedules/parcel/${parcelId}`),
 
+  /** POST /api/schedules/parcel/{parcelId} */
   create: (parcelId, data) =>
     request("POST", `/schedules/parcel/${parcelId}`, data),
 
+  /** PUT /api/schedules/{id} */
   update: (id, data) => request("PUT", `/schedules/${id}`, data),
 
+  /** POST /api/schedules/{id}/execute */
   execute: (id) => request("POST", `/schedules/${id}/execute`),
 
+  /** DELETE /api/schedules/{id} */
   delete: (id) => request("DELETE", `/schedules/${id}`),
 };

@@ -58,17 +58,17 @@ public class IrrigationHistoryController {
         );
     }
     @GetMapping("/parcel/{parcelId}/export")
-public ResponseEntity<byte[]> exportHistoryCsvByParcel(@PathVariable Long parcelId) {
-    String csv = irrigationHistoryService.exportHistoryCsvByParcel(parcelId);
+    public ResponseEntity<byte[]> exportHistoryCsvByParcel(@PathVariable Long parcelId) {
+        String csv = irrigationHistoryService.exportHistoryCsvByParcel(parcelId);
+        byte[] csvBytes = csv.getBytes(StandardCharsets.UTF_8);
 
-    byte[] csvBytes = csv.getBytes(StandardCharsets.UTF_8);
-
-    return ResponseEntity.ok()
-            .header(
-                    HttpHeaders.CONTENT_DISPOSITION,
-                    "attachment; filename=irrigation-history-parcel-" + parcelId + ".csv"
+        return ResponseEntity.ok()
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=irrigation-history-parcel-" + parcelId + ".csv"
             )
             .contentType(MediaType.parseMediaType("text/csv"))
             .body(csvBytes);
-}
+        }
+    
 }

@@ -50,36 +50,31 @@ public class IrrigationHistoryServiceImpl implements IrrigationHistoryService {
 
         return irrigationHistoryRepository.findAllByParcel(parcel);
     }
+    
 
     @Override
     public String exportHistoryCsvByParcel(Long parcelId) {
-    List<IrrigationHistory> history =
-            irrigationHistoryRepository.findByParcelIdOrderByIrrigationDateDescIrrigationTimeDesc(parcelId);
-
-    StringBuilder csv = new StringBuilder();
-
-    csv.append("\uFEFF");
-    csv.append("ДАТУМ,ВРЕМЕ,КОЛИЧИНА,ПАРЦЕЛА\n");
-
-    for (IrrigationHistory item : history) {
-        csv.append(item.getIrrigationDate()).append(",");
-        csv.append(item.getIrrigationTime()).append(",");
-        csv.append(item.getWaterAmount()).append(" л").append(",");
-
-        if (item.getParcel() != null) {
-            csv.append(item.getParcel().getName());
-        } else {
-            csv.append("/");
+        List<IrrigationHistory> history =
+        irrigationHistoryRepository.findByParcelIdOrderByIrrigationDateDescIrrigationTimeDesc(parcelId);
+        
+        StringBuilder csv = new StringBuilder();
+        csv.append("\uFEFF");
+        csv.append("ДАТУМ,ВРЕМЕ,КОЛИЧИНА,ПАРЦЕЛА\n");
+        
+        for (IrrigationHistory item : history) {
+            csv.append(item.getIrrigationDate()).append(",");
+            csv.append(item.getIrrigationTime()).append(",");
+            csv.append(item.getWaterAmount()).append(" л").append(",");
+            
+            if (item.getParcel() != null) {
+                csv.append(item.getParcel().getName());
+            } else {
+                csv.append("/");
         }
 
         csv.append("\n");
     }
-
     return csv.toString();
 }
-
-
-
-
    
 }

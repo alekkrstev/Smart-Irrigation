@@ -71,10 +71,11 @@ function DetailsScreen({ parcelId, setScreen }) {
       ]);
 
       const firstSchedule = Array.isArray(schedules) ? schedules[0] : schedules;
+      const rec = Array.isArray(r) ? r[0] : r;
 
       setParcel(parcelMeta(p));
-      setHistory(h);
-      setRecommendation(r);
+      setHistory(Array.isArray(h) ? h : []);
+      setRecommendation(rec || null);
       setSchedule(firstSchedule || null);
     } catch (e) {
       console.error(e);
@@ -114,6 +115,8 @@ function DetailsScreen({ parcelId, setScreen }) {
     let cancelled = false;
 
     async function fetchDetails() {
+      setLoading(true);
+
       try {
         const [p, h, r, schedules] = await Promise.all([
           parcelApi.getById(parcelId),
@@ -128,12 +131,21 @@ function DetailsScreen({ parcelId, setScreen }) {
           ? schedules[0]
           : schedules;
 
+        const rec = Array.isArray(r) ? r[0] : r;
+
         setParcel(parcelMeta(p));
-        setHistory(h);
-        setRecommendation(r);
+        setHistory(Array.isArray(h) ? h : []);
+        setRecommendation(rec || null);
         setSchedule(firstSchedule || null);
       } catch (e) {
         console.error(e);
+
+        if (!cancelled) {
+          setParcel(null);
+          setHistory([]);
+          setRecommendation(null);
+          setSchedule(null);
+        }
       } finally {
         if (!cancelled) {
           setLoading(false);
