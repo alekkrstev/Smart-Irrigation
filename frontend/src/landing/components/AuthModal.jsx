@@ -5,7 +5,6 @@ function AuthModal({ mode, onClose, onSwitch, onSuccess }) {
   const { login, register, loading, error } = useAuth();
   const [form, setForm] = useState({
     firstName: "",
-    lastName: "",
     email: "",
     password: "",
   });
@@ -26,7 +25,7 @@ function AuthModal({ mode, onClose, onSwitch, onSuccess }) {
       if (isLogin) {
         await login(form.email, form.password);
       } else {
-        const name = `${form.firstName} ${form.lastName}`.trim() || form.email;
+        const name = `${form.firstName}`.trim() || form.email;
         await register(name, form.email, form.password);
       }
       onSuccess();
@@ -154,27 +153,18 @@ function AuthModal({ mode, onClose, onSwitch, onSuccess }) {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: "1fr",
               gap: 12,
               marginBottom: 12,
             }}
           >
             <div>
-              <label style={labelStyle}>Ime</label>
+              <label style={labelStyle}>Име и Презиме</label>
               <input
                 style={inputStyle}
-                placeholder="Марко"
+                placeholder="Марко Петров"
                 value={form.firstName}
                 onChange={set("firstName")}
-              />
-            </div>
-            <div>
-              <label style={labelStyle}>Презиме</label>
-              <input
-                style={inputStyle}
-                placeholder="Петров"
-                value={form.lastName}
-                onChange={set("lastName")}
               />
             </div>
           </div>

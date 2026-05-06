@@ -9,6 +9,7 @@ import irrigation_system.backend.repository.UserRepository;
 import irrigation_system.backend.service.ParcelService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -79,8 +80,9 @@ public class ParcelServiceImpl implements ParcelService {
 
         return parcelRepository.save(existingParcel);
     }
-
+    
     @Override
+    @Transactional
     public void deleteParcel(Long id) {
         if (!parcelRepository.existsById(id)) {
             throw new IllegalArgumentException("Parcel not found with id: " + id);

@@ -2,9 +2,10 @@ package irrigation_system.backend.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Parcel {
@@ -33,6 +34,22 @@ public class Parcel {
     @JsonIgnore
     private User user;
 
+    @OneToMany(
+            mappedBy = "parcel",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private List<IrrigationHistory> irrigationHistory = new ArrayList<>();
+
+    @OneToOne(
+            mappedBy = "parcel",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true
+    )
+    @JsonIgnore
+    private IrrigationSchedule irrigationSchedule;
+
     public Parcel() {
     }
 
@@ -54,9 +71,6 @@ public class Parcel {
 
     public ParcelPriority getPriority() {
         return priority;
-}
-    public void setPriority(ParcelPriority priority) {
-        this.priority = priority;
     }
 
     public String getSoilType() {
@@ -83,6 +97,14 @@ public class Parcel {
         return user;
     }
 
+    public List<IrrigationHistory> getIrrigationHistory() {
+        return irrigationHistory;
+    }
+
+    public IrrigationSchedule getIrrigationSchedule() {
+        return irrigationSchedule;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
@@ -97,6 +119,10 @@ public class Parcel {
 
     public void setSize(Double size) {
         this.size = size;
+    }
+
+    public void setPriority(ParcelPriority priority) {
+        this.priority = priority;
     }
 
     public void setSoilType(String soilType) {
@@ -121,5 +147,13 @@ public class Parcel {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public void setIrrigationHistory(List<IrrigationHistory> irrigationHistory) {
+        this.irrigationHistory = irrigationHistory;
+    }
+
+    public void setIrrigationSchedule(IrrigationSchedule irrigationSchedule) {
+        this.irrigationSchedule = irrigationSchedule;
     }
 }
