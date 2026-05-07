@@ -35,6 +35,9 @@ public class Parcel {
     @OneToOne(mappedBy = "parcel", cascade = CascadeType.ALL)
     private IrrigationSchedule irrigationSchedule;
 
+    @OneToMany(mappedBy = "parcel", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Recommendation> recommendations;
+
     public Parcel() {}
 
     // getters & setters
