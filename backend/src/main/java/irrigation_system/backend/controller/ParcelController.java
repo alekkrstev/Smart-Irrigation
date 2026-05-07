@@ -57,16 +57,17 @@ public class ParcelController {
         parcelService.deleteParcel(id);
         return ResponseEntity.noContent().build();
     }
+
     @PostMapping("/import/{userId}")
-public ResponseEntity<String> importParcelsCsv(
-        @PathVariable Long userId,
-        @RequestParam("file") MultipartFile file
-) {
-    try {
-        parcelService.importParcelsCsv(userId, file);
-        return ResponseEntity.ok("CSV успешно внесен.");
-    } catch (Exception e) {
-        return ResponseEntity.badRequest().body("Грешка при внесување CSV: " + e.getMessage());
+    public ResponseEntity<String> importParcelsCsv(
+            @PathVariable Long userId,
+            @RequestParam("file") MultipartFile file
+    ) {
+        try {
+            int importedCount = parcelService.importParcelsCsv(userId, file);
+            return ResponseEntity.ok("CSV successfully imported. Parcels created: " + importedCount + ".");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("CSV import failed: " + e.getMessage());
+        }
     }
-}
 }

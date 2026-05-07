@@ -3,131 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Smart Irrigation API Tester</title>
+    <title>SmartAgro Dashboard</title>
     <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-<header class="app-header">
-    <div>
-        <h1>Smart Irrigation</h1>
-        <p>Basic CRUD tester for the backend API</p>
-    </div>
-    <div class="status">
-        <span>Current user ID</span>
-        <strong id="currentUserId">-</strong>
-    </div>
-</header>
-
-<main class="layout">
-    <section class="panel">
-        <h2>Auth</h2>
-        <form id="registerForm" class="stack">
-            <h3>Register</h3>
-            <input name="name" placeholder="Name" value="Test User" required>
-            <input name="email" type="email" placeholder="Email" value="test@example.com" required>
-            <input name="password" type="password" placeholder="Password" value="password123" required>
-            <button type="submit">Register</button>
-        </form>
-
-        <form id="loginForm" class="stack">
-            <h3>Login</h3>
-            <input name="email" type="email" placeholder="Email" value="bojan@example.com" required>
-            <input name="password" type="password" placeholder="Password" value="password123" required>
-            <button type="submit">Login</button>
-        </form>
-
-        <form id="findUserForm" class="stack">
-            <h3>Find User</h3>
-            <input name="userId" type="number" placeholder="User ID" value="1" required>
-            <button type="submit">Find by ID</button>
-        </form>
-    </section>
-
-    <section class="panel wide">
-        <div class="section-head">
-            <h2>Parcels</h2>
-            <button id="loadParcelsBtn" type="button">Load User Parcels</button>
+<div id="authView" class="auth-shell">
+    <section class="auth-panel">
+        <div class="brand-lockup">
+            <span class="brand-mark">SA</span>
+            <div>
+                <h1>SmartAgro</h1>
+                <p>Smart irrigation solutions</p>
+            </div>
         </div>
 
-        <form id="parcelForm" class="grid-form">
-            <input name="id" type="number" placeholder="Parcel ID for update/delete">
-            <input name="name" placeholder="Name" value="Test Field" required>
-            <input name="location" placeholder="Location" value="Skopje" required>
-            <input name="size" type="number" step="0.1" placeholder="Size" value="2.5" required>
-            <input name="cropType" placeholder="Crop type" value="Tomatoes" required>
-            <input name="lastIrrigation" type="date" value="2026-04-24">
-            <textarea name="notes" placeholder="Notes">Created from frontend tester.</textarea>
-            <div class="actions">
-                <button type="submit" data-action="create">Create</button>
-                <button type="button" id="updateParcelBtn">Update</button>
-                <button type="button" id="deleteParcelBtn" class="danger">Delete</button>
-            </div>
-        </form>
-
-        <div id="parcelsList" class="cards"></div>
-    </section>
-
-    <section class="panel">
-        <h2>Irrigation History</h2>
-        <form id="historyForm" class="stack">
-            <input name="parcelId" type="number" placeholder="Parcel ID" required>
-            <input name="waterAmount" type="number" step="0.1" placeholder="Water amount" value="100" required>
-            <button type="submit">Add Irrigation</button>
-            <button type="button" id="loadHistoryBtn">Load History</button>
-        </form>
-        <div id="historyList" class="list"></div>
-    </section>
-
-    <section class="panel">
-        <h2>Schedules</h2>
-        <form id="scheduleForm" class="stack">
-            <input name="id" type="number" placeholder="Schedule ID for update/delete/execute">
-            <input name="parcelId" type="number" placeholder="Parcel ID" required>
-            <input name="intervalDays" type="number" placeholder="Interval days" value="3" required>
-            <input name="waterAmount" type="number" step="0.1" placeholder="Water amount" value="120" required>
-            <label class="check">
-                <input name="active" type="checkbox" checked>
-                Active
+        <form id="loginForm" class="auth-form">
+            <h2>Log in</h2>
+            <label>
+                Email
+                <input name="email" type="email" value="bojan@example.com" required>
             </label>
-            <div class="actions">
-                <button type="submit">Create</button>
-                <button type="button" id="updateScheduleBtn">Update</button>
-                <button type="button" id="executeScheduleBtn">Execute</button>
-                <button type="button" id="deleteScheduleBtn" class="danger">Delete</button>
-            </div>
-            <button type="button" id="loadSchedulesBtn">Load Parcel Schedules</button>
-        </form>
-        <div id="schedulesList" class="list"></div>
-    </section>
-
-    <section class="panel">
-        <h2>Recommendations</h2>
-        <form id="recommendationForm" class="stack">
-            <input name="parcelId" type="number" placeholder="Parcel ID" required>
-            <button type="submit">Get Daily Recommendation</button>
-        </form>
-
-        <form id="calculateForm" class="stack">
-            <h3>Calculate Water</h3>
-            <input name="parcelId" type="number" placeholder="Parcel ID" required>
-            <input name="temperature" type="number" step="0.1" placeholder="Temperature" value="30" required>
-            <input name="humidity" type="number" step="0.1" placeholder="Humidity" value="35" required>
-            <label class="check">
-                <input name="rainExpected" type="checkbox">
-                Rain expected
+            <label>
+                Password
+                <input name="password" type="password" value="password123" required>
             </label>
-            <button type="submit">Calculate</button>
+            <button type="submit">Log in</button>
+            <p id="authMessage" class="form-message"></p>
         </form>
     </section>
+</div>
 
-    <section class="panel wide">
-        <div class="section-head">
-            <h2>API Result</h2>
-            <button id="clearOutputBtn" type="button">Clear</button>
+<div id="appView" class="app-shell" hidden>
+    <header class="topbar">
+        <button id="dashboardNavBtn" class="logo-button" type="button" aria-label="Open dashboard">
+            <span class="brand-mark">SA</span>
+            <span>SmartAgro</span>
+        </button>
+
+        <nav class="nav-pills" aria-label="Primary">
+            <button id="homeNavBtn" class="nav-pill active" type="button">
+                <span class="icon">▦</span>
+                Overview
+            </button>
+            <button id="parcelsNavBtn" class="nav-pill" type="button">
+                <span class="icon">≋</span>
+                My parcels
+            </button>
+            <button class="nav-pill" type="button">
+                <span class="icon">◌</span>
+                Irrigation
+            </button>
+        </nav>
+
+        <div class="profile-chip">
+            <span class="avatar">●</span>
+            <span id="profileName">User</span>
         </div>
-        <pre id="output">{}</pre>
-    </section>
-</main>
+    </header>
+
+    <main class="dashboard">
+        <section id="dashboardView" class="view">
+            <div class="hero-row">
+                <div>
+                    <h1 id="greeting">Hello</h1>
+                    <p id="todayLabel">Today</p>
+                </div>
+                <button id="addParcelBtn" class="primary-action" type="button">+ Add parcel</button>
+            </div>
+
+            <div class="stats-grid">
+                <article class="stat-card green-top">
+                    <span class="stat-icon">🌱</span>
+                    <strong id="activeParcelsCount">0</strong>
+                    <span>active parcels</span>
+                    <small id="totalSizeLabel">Total 0 ha</small>
+                </article>
+                <article class="stat-card blue-top">
+                    <span class="stat-icon">💧</span>
+                    <strong id="needsWaterCount">0</strong>
+                    <span>need irrigation</span>
+                    <small>Based on recent watering</small>
+                </article>
+                <article class="stat-card amber-top">
+                    <span class="stat-icon">🌡</span>
+                    <strong>24°</strong>
+                    <span>temperature today</span>
+                    <small>+3° from yesterday</small>
+                </article>
+                <article class="stat-card rose-top">
+                    <span class="stat-icon">🚨</span>
+                    <strong id="recommendationsCount">0</strong>
+                    <span>recommendations</span>
+                    <small id="priorityParcelLabel">No priority parcel</small>
+                </article>
+            </div>
+
+            <div class="content-grid">
+                <section class="panel-card">
+                    <div class="panel-head">
+                        <div>
+                            <h2>📍 My parcels</h2>
+                            <p>Status - latest</p>
+                        </div>
+                        <button id="showAllParcelsBtn" class="ghost-button" type="button">→ All</button>
+                    </div>
+                    <div id="latestParcelsList" class="latest-list"></div>
+                </section>
+
+                <section class="panel-card">
+                    <div class="panel-head">
+                        <div>
+                            <h2>🧠 AI recommendations - today</h2>
+                            <p>Based on available parcel data</p>
+                        </div>
+                    </div>
+                    <div id="recommendationPanel" class="recommendation-card"></div>
+                </section>
+            </div>
+        </section>
+
+        <section id="allParcelsView" class="view" hidden>
+            <div class="page-head">
+                <div>
+                    <h1>All parcels</h1>
+                    <p>Manage every parcel connected to your account.</p>
+                </div>
+                <div class="page-actions">
+                    <button id="backToDashboardBtn" class="secondary-action" type="button">Dashboard</button>
+                    <button id="addParcelFromAllBtn" class="primary-action" type="button">+ Add parcel</button>
+                </div>
+            </div>
+            <div id="allParcelsList" class="parcel-grid"></div>
+        </section>
+
+        <section id="parcelDetailView" class="view" hidden>
+            <button id="backToParcelsBtn" class="back-button" type="button">← Back to parcels</button>
+
+            <div class="parcel-detail-head">
+                <span id="detailAccent" class="parcel-accent yellow"></span>
+                <div>
+                    <h1 id="detailName">Parcel</h1>
+                    <p id="detailMeta">Crop · Location · Size</p>
+                </div>
+            </div>
+
+            <div class="detail-actions">
+                <button id="irrigateParcelBtn" class="primary-action" type="button">💧 Irrigate now</button>
+                <button id="editParcelBtn" class="secondary-action" type="button">✎ Edit</button>
+                <button id="deleteParcelBtn" class="danger-action" type="button">Delete</button>
+            </div>
+
+            <div class="detail-grid">
+                <section class="panel-card">
+                    <div class="panel-head">
+                        <div>
+                            <h2>📊 Information</h2>
+                            <p>Current parcel details</p>
+                        </div>
+                    </div>
+                    <div id="parcelInfoGrid" class="info-grid"></div>
+                </section>
+
+                <section class="panel-card">
+                    <div class="panel-head">
+                        <div>
+                            <h2>📈 Irrigation - last 7 records</h2>
+                            <p>Recorded water amounts</p>
+                        </div>
+                    </div>
+                    <div id="irrigationChart" class="irrigation-chart"></div>
+                </section>
+            </div>
+
+            <section class="panel-card history-panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>📋 Irrigation history</h2>
+                        <p>Manual and scheduled watering events</p>
+                    </div>
+                </div>
+                <div id="historyTable" class="history-table"></div>
+            </section>
+        </section>
+    </main>
+</div>
+
+<dialog id="parcelDialog" class="parcel-dialog">
+    <form id="parcelForm" method="dialog" class="parcel-form">
+        <input name="id" type="hidden">
+        <div class="dialog-head">
+            <div>
+                <h2 id="parcelDialogTitle">New parcel</h2>
+                <p id="parcelDialogSubtitle">Add a parcel to your SmartAgro account.</p>
+            </div>
+            <button id="closeParcelDialogBtn" class="icon-button" type="button" aria-label="Close">×</button>
+        </div>
+        <label>
+            Name
+            <input name="name" placeholder="Tomato Field" required>
+        </label>
+        <label>
+            Location
+            <input name="location" placeholder="Skopje - Aerodrom" required>
+        </label>
+        <div class="form-grid">
+            <label>
+                Size in ha
+                <input name="size" type="number" step="0.1" min="0.1" placeholder="2.5" required>
+            </label>
+            <label>
+                Crop type
+                <input name="cropType" placeholder="Tomatoes" required>
+            </label>
+        </div>
+        <label>
+            Last irrigation
+            <input name="lastIrrigation" type="date">
+        </label>
+        <label>
+            Notes
+            <textarea name="notes" placeholder="Optional parcel notes"></textarea>
+        </label>
+        <p id="parcelMessage" class="form-message"></p>
+        <div class="dialog-actions">
+            <button id="cancelParcelBtn" class="secondary-action" type="button">Cancel</button>
+            <button id="saveParcelBtn" class="primary-action" type="submit">Create parcel</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog id="irrigationDialog" class="parcel-dialog">
+    <form id="irrigationForm" method="dialog" class="parcel-form">
+        <div class="dialog-head">
+            <div>
+                <h2>Irrigate parcel</h2>
+                <p id="irrigationDialogSubtitle">Add a watering record.</p>
+            </div>
+            <button id="closeIrrigationDialogBtn" class="icon-button" type="button" aria-label="Close">×</button>
+        </div>
+        <label>
+            Water amount in liters
+            <input name="waterAmount" type="number" step="0.1" min="0.1" placeholder="120" required>
+        </label>
+        <p id="irrigationMessage" class="form-message"></p>
+        <div class="dialog-actions">
+            <button id="cancelIrrigationBtn" class="secondary-action" type="button">Cancel</button>
+            <button class="primary-action" type="submit">Save irrigation</button>
+        </div>
+    </form>
+</dialog>
 
 <script src="/app.js"></script>
 </body>

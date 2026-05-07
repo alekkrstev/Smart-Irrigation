@@ -20,5 +20,5 @@ public interface ParcelService {
 
     Parcel getById(Long id);
 
-    void importParcelsCsv(Long userId, MultipartFile file) throws IOException;
+    int importParcelsCsv(Long userId, MultipartFile file) throws IOException;
 }

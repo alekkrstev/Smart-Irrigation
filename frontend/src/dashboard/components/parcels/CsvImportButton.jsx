@@ -1,39 +1,46 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 function CsvImportButton({ userId, onImportSuccess }) {
   const fileInputRef = useRef(null);
+  const [importing, setImporting] = useState(false);
 
   async function handleFileChange(e) {
     const file = e.target.files[0];
 
     if (!file) return;
 
+    if (!userId) {
+      alert("Please log in before importing parcels.");
+      e.target.value = "";
+      return;
+    }
+
     const formData = new FormData();
     formData.append("file", file);
+    setImporting(true);
 
     try {
-      const response = await fetch(
-        `http://localhost:8080/api/parcels/import/${userId}`,
-        {
-          method: "POST",
-          body: formData,
-        },
-      );
+      const response = await fetch(`/api/parcels/import/${userId}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      const message = await response.text();
 
       if (!response.ok) {
-        const message = await response.text();
         throw new Error(message || "CSV import failed");
       }
 
-      alert("CSV успешно внесен.");
+      alert(message || "CSV successfully imported.");
 
       if (onImportSuccess) {
         await onImportSuccess();
       }
     } catch (error) {
       console.error(error);
-      alert("Неуспешно внесување CSV: " + error.message);
+      alert("CSV import failed: " + error.message);
     } finally {
+      setImporting(false);
       e.target.value = "";
     }
   }
@@ -43,16 +50,17 @@ function CsvImportButton({ userId, onImportSuccess }) {
       <input
         ref={fileInputRef}
         type="file"
-        accept=".csv"
+        accept=".csv,text/csv"
         style={{ display: "none" }}
         onChange={handleFileChange}
       />
 
       <button
         className="btn-primary"
-        onClick={() => fileInputRef.current.click()}
+        disabled={importing}
+        onClick={() => fileInputRef.current?.click()}
       >
-        📤 Внеси CSV
+        {importing ? "Се внесува..." : "📤 Внеси CSV"}
       </button>
     </>
   );

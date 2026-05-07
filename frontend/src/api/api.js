@@ -1,5 +1,5 @@
 // ─── Base ────────────────────────────────────────────────────────────────────
-const BASE = "http://localhost:8080/api";
+const BASE = "/api";
 
 async function request(method, path, body) {
   const res = await fetch(`${BASE}${path}`, {

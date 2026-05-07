@@ -16,6 +16,7 @@ import RecommendationCard from "../components/details/RecommendationCard";
 import HistoryCard from "../components/details/HistoryCard";
 import IrrigateModal from "../components/details/IrrigateModal";
 import ScheduleModal from "../components/details/ScheduleModal";
+import AddParcelModal from "../components/parcels/AddParcelModal";
 
 function parcelMeta(p) {
   const cropLower = (p.cropType || "").toLowerCase();
@@ -58,6 +59,7 @@ function DetailsScreen({ parcelId, setScreen }) {
   const [loading, setLoading] = useState(() => Boolean(parcelId));
   const [showIrrigate, setShowIrrigate] = useState(false);
   const [showSchedule, setShowSchedule] = useState(false);
+  const [showEdit, setShowEdit] = useState(false);
 
   const loadData = async () => {
     if (!parcelId) return;
@@ -85,7 +87,7 @@ function DetailsScreen({ parcelId, setScreen }) {
   async function exportHistoryCsv() {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/irrigation-history/parcel/${parcelId}/export`,
+        `/api/irrigation-history/parcel/${parcelId}/export`,
       );
 
       if (!response.ok) {
@@ -108,6 +110,28 @@ function DetailsScreen({ parcelId, setScreen }) {
       alert("Неуспешно извезување на CSV.");
     }
   }
+
+  const handleUpdate = async (formData) => {
+    await parcelApi.update(parcelId, formData);
+    setShowEdit(false);
+    await loadData();
+  };
+
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "Сигурни ли сте дека сакате да ја избришете оваа парцела?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await parcelApi.delete(parcelId);
+      setScreen("parcels");
+    } catch (err) {
+      console.error("Delete failed:", err);
+      alert("Не може да се избрише парцелата: " + err.message);
+    }
+  };
 
   useEffect(() => {
     if (!parcelId) return;
@@ -223,6 +247,14 @@ function DetailsScreen({ parcelId, setScreen }) {
         />
       )}
 
+      {showEdit && (
+        <AddParcelModal
+          parcel={parcel}
+          onClose={() => setShowEdit(false)}
+          onSave={handleUpdate}
+        />
+      )}
+
       <button
         className="btn-ghost fade-in"
         onClick={() => setScreen("parcels")}
@@ -237,6 +269,8 @@ function DetailsScreen({ parcelId, setScreen }) {
         priorityBadge={priorityBadge}
         priorityLabel={priorityLabel}
         onIrrigate={() => setShowIrrigate(true)}
+        onEdit={() => setShowEdit(true)}
+        onDelete={handleDelete}
       />
 
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>

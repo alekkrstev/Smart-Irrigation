@@ -4,7 +4,10 @@ import irrigation_system.backend.dto.ParcelRequest;
 import irrigation_system.backend.model.Parcel;
 import irrigation_system.backend.model.ParcelPriority;
 import irrigation_system.backend.model.User;
+import irrigation_system.backend.repository.IrrigationHistoryRepository;
+import irrigation_system.backend.repository.IrrigationScheduleRepository;
 import irrigation_system.backend.repository.ParcelRepository;
+import irrigation_system.backend.repository.RecommendationRepository;
 import irrigation_system.backend.repository.UserRepository;
 import irrigation_system.backend.service.ParcelService;
 import org.springframework.stereotype.Service;
@@ -23,10 +26,22 @@ public class ParcelServiceImpl implements ParcelService {
 
     private final ParcelRepository parcelRepository;
     private final UserRepository userRepository;
+    private final IrrigationHistoryRepository irrigationHistoryRepository;
+    private final IrrigationScheduleRepository irrigationScheduleRepository;
+    private final RecommendationRepository recommendationRepository;
 
-    public ParcelServiceImpl(ParcelRepository parcelRepository, UserRepository userRepository) {
+    public ParcelServiceImpl(
+            ParcelRepository parcelRepository,
+            UserRepository userRepository,
+            IrrigationHistoryRepository irrigationHistoryRepository,
+            IrrigationScheduleRepository irrigationScheduleRepository,
+            RecommendationRepository recommendationRepository
+    ) {
         this.parcelRepository = parcelRepository;
         this.userRepository = userRepository;
+        this.irrigationHistoryRepository = irrigationHistoryRepository;
+        this.irrigationScheduleRepository = irrigationScheduleRepository;
+        this.recommendationRepository = recommendationRepository;
     }
 
     @Override
@@ -84,11 +99,15 @@ public class ParcelServiceImpl implements ParcelService {
     @Override
     @Transactional
     public void deleteParcel(Long id) {
-        if (!parcelRepository.existsById(id)) {
-            throw new IllegalArgumentException("Parcel not found with id: " + id);
-        }
+        Parcel parcel = parcelRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Parcel not found with id: " + id));
 
-        parcelRepository.deleteById(id);
+        recommendationRepository.deleteAll(recommendationRepository.findAllByParcel(parcel));
+        irrigationScheduleRepository.findByParcel(parcel)
+                .ifPresent(irrigationScheduleRepository::delete);
+        irrigationHistoryRepository.deleteAll(irrigationHistoryRepository.findAllByParcel(parcel));
+
+        parcelRepository.delete(parcel);
     }
 
     @Override
@@ -98,27 +117,41 @@ public class ParcelServiceImpl implements ParcelService {
     }
 
     @Override
-    public void importParcelsCsv(Long userId, MultipartFile file) throws IOException {
+    public int importParcelsCsv(Long userId, MultipartFile file) throws IOException {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found with id: " + userId));
+
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("CSV file is empty.");
+        }
 
         BufferedReader reader = new BufferedReader(
                 new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8)
         );
 
         String line;
-        boolean firstLine = true;
+        int lineNumber = 0;
+        int importedCount = 0;
 
         while ((line = reader.readLine()) != null) {
-            if (firstLine) {
-                firstLine = false;
+            lineNumber++;
+
+            String normalizedLine = line.replace("\uFEFF", "").trim();
+
+            if (normalizedLine.isEmpty()) {
                 continue;
             }
 
-            String[] data = line.split(",");
-
-            if (data.length < 7) {
+            if (lineNumber == 1 && hasHeader(normalizedLine)) {
                 continue;
+            }
+
+            String[] data = splitCsvLine(normalizedLine);
+
+            if (data.length < 6) {
+                throw new IllegalArgumentException(
+                        "Line " + lineNumber + " must contain at least 6 columns: name, location, size, soilType, irrigationSystem, cropType."
+                );
             }
 
             Parcel parcel = new Parcel();
@@ -129,10 +162,12 @@ public class ParcelServiceImpl implements ParcelService {
             parcel.setSoilType(data[3].trim());
             parcel.setIrrigationSystem(data[4].trim());
             parcel.setCropType(data[5].trim());
-            parcel.setLastIrrigation(LocalDate.parse(data[6].trim()));
+            parcel.setLastIrrigation(data.length >= 7 && !data[6].trim().isEmpty()
+                    ? LocalDate.parse(data[6].trim())
+                    : null);
             parcel.setUser(user);
 
-            if (data.length >= 8) {
+            if (data.length >= 8 && !data[7].trim().isEmpty()) {
                 parcel.setNotes(data[7].trim());
             }
 
@@ -143,7 +178,29 @@ public class ParcelServiceImpl implements ParcelService {
             }
 
             parcelRepository.save(parcel);
+            importedCount++;
         }
+
+        if (importedCount == 0) {
+            throw new IllegalArgumentException("CSV did not contain any parcel rows.");
+        }
+
+        return importedCount;
+    }
+
+    private boolean hasHeader(String line) {
+        String firstColumn = splitCsvLine(line)[0].trim().toLowerCase();
+
+        return firstColumn.equals("name")
+                || firstColumn.equals("назив")
+                || firstColumn.equals("parcel")
+                || firstColumn.equals("парцела");
+    }
+
+    private String[] splitCsvLine(String line) {
+        String delimiter = line.contains(";") && !line.contains(",") ? ";" : ",";
+
+        return line.split(delimiter, -1);
     }
 
     private int priorityRank(ParcelPriority priority) {

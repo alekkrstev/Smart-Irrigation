@@ -8,10 +8,12 @@ import Testimonials from "./components/Testimonials";
 import Pricing from "./components/Pricing";
 import Footer from "./components/Footer";
 import AuthModal from "./components/AuthModal";
+import { useAuth } from "../context/AuthContext";
 
 import useScrollReveal from "./hooks/useScrollReveal";
 
 export default function SmartAgroLanding({ onEnterApp }) {
+  const { user, logout } = useAuth();
   const [modal, setModal] = useState(null);
 
   useScrollReveal();
@@ -19,8 +21,11 @@ export default function SmartAgroLanding({ onEnterApp }) {
   return (
     <>
       <LandingNav
+        user={user}
         onLogin={() => setModal("login")}
         onRegister={() => setModal("register")}
+        onEnterApp={onEnterApp}
+        onLogout={logout}
       />
 
       <Hero onRegister={() => setModal("register")} onEnterApp={onEnterApp} />

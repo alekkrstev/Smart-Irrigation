@@ -2,10 +2,16 @@ import { useState } from "react";
 import { authApi } from "../api/api";
 import { AuthContext } from "./AuthContext";
 
+const USER_STORAGE_KEY = "agro_user";
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
     try {
-      return JSON.parse(sessionStorage.getItem("agro_user")) || null;
+      const storedUser =
+        localStorage.getItem(USER_STORAGE_KEY) ||
+        sessionStorage.getItem(USER_STORAGE_KEY);
+
+      return storedUser ? JSON.parse(storedUser) : null;
     } catch {
       return null;
     }
@@ -21,7 +27,8 @@ export function AuthProvider({ children }) {
     try {
       const u = await authApi.login(email, password);
       setUser(u);
-      sessionStorage.setItem("agro_user", JSON.stringify(u));
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(u));
+      sessionStorage.removeItem(USER_STORAGE_KEY);
       return u;
     } catch (e) {
       setError(e.message);
@@ -38,7 +45,8 @@ export function AuthProvider({ children }) {
     try {
       const u = await authApi.register(name, email, password);
       setUser(u);
-      sessionStorage.setItem("agro_user", JSON.stringify(u));
+      localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(u));
+      sessionStorage.removeItem(USER_STORAGE_KEY);
       return u;
     } catch (e) {
       setError(e.message);
@@ -50,7 +58,8 @@ export function AuthProvider({ children }) {
 
   const logout = () => {
     setUser(null);
-    sessionStorage.removeItem("agro_user");
+    localStorage.removeItem(USER_STORAGE_KEY);
+    sessionStorage.removeItem(USER_STORAGE_KEY);
   };
 
   return (

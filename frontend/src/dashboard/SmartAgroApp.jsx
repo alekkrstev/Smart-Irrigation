@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import agroBackground from "../assets/agro-background.png";
 import DashboardNavbar from "./components/DashboardNavbar";
@@ -7,9 +7,37 @@ import ParcelsScreen from "./screens/ParcelsScreen";
 import DetailsScreen from "./screens/DetailsScreen";
 import WaterScreen from "./screens/WaterScreen";
 
-export default function SmartAgroApp({ onBackLanding }) {
-  const [screen, setScreen] = useState("home");
-  const [selected, setSelected] = useState("B3");
+export default function SmartAgroApp({
+  initialScreen = "home",
+  initialSelected = null,
+  navigateTo,
+  onBackLanding,
+}) {
+  const [screen, setScreenState] = useState(initialScreen);
+  const [selected, setSelectedState] = useState(initialSelected);
+  const selectedRef = useRef(initialSelected);
+
+  useEffect(() => {
+    setScreenState(initialScreen);
+    setSelectedState(initialSelected);
+    selectedRef.current = initialSelected;
+  }, [initialScreen, initialSelected]);
+
+  const setSelected = (parcelId) => {
+    selectedRef.current = parcelId;
+    setSelectedState(parcelId);
+  };
+
+  const setScreen = (nextScreen) => {
+    setScreenState(nextScreen);
+
+    if (nextScreen === "details") {
+      navigateTo({ screen: "details", parcelId: selectedRef.current });
+      return;
+    }
+
+    navigateTo({ screen: nextScreen });
+  };
 
   return (
     <div

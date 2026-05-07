@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import smart_agro_icon from "../../assets/smart_agro_icon.png";
 
-function LandingNav({ onLogin, onRegister }) {
+function LandingNav({ user, onLogin, onRegister, onEnterApp, onLogout }) {
   const links = [
     { label: "Почетна", id: "hero" },
     { label: "Карактеристики", id: "features" },
@@ -134,6 +134,54 @@ function LandingNav({ onLogin, onRegister }) {
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        {user && (
+          <>
+            <button
+              onClick={onEnterApp}
+              style={{
+                padding: "9px 24px",
+                borderRadius: 50,
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: "white",
+                background: "var(--forest)",
+                border: "none",
+                cursor: "pointer",
+                transition: "all .22s",
+                boxShadow: "0 4px 16px rgba(45,90,39,.3)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "var(--leaf)";
+                e.currentTarget.style.transform = "translateY(-1px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "var(--forest)";
+                e.currentTarget.style.transform = "";
+              }}
+            >
+              Кон апликација →
+            </button>
+
+            <button
+              onClick={onLogout}
+              style={{
+                padding: "8px 20px",
+                borderRadius: 50,
+                fontSize: 13.5,
+                fontWeight: 600,
+                color: "var(--forest)",
+                background: "none",
+                border: "1.5px solid rgba(74,140,63,.25)",
+                cursor: "pointer",
+                transition: "all .2s",
+              }}
+            >
+              Одјави се
+            </button>
+          </>
+        )}
+        {!user && (
+          <>
         <button
           onClick={onLogin}
           style={{
@@ -184,6 +232,8 @@ function LandingNav({ onLogin, onRegister }) {
         >
           Започни бесплатно →
         </button>
+          </>
+        )}
       </div>
     </nav>
   );

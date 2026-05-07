@@ -6,6 +6,8 @@ function DetailsHeaderCard({
   priorityBadge,
   priorityLabel,
   onIrrigate,
+  onEdit,
+  onDelete,
 }) {
   return (
     <div
@@ -45,13 +47,37 @@ function DetailsHeaderCard({
           </div>
         </div>
 
-        <div style={{ display: "flex", gap: 8 }}>
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
           <button
             className="btn-primary"
             style={{ fontSize: 12 }}
             onClick={onIrrigate}
           >
             💧 Наводни сега
+          </button>
+
+          <button
+            className="btn-ghost"
+            style={{
+              fontSize: 12,
+              color: "var(--green-700)",
+              borderColor: "var(--green-300)",
+            }}
+            onClick={onEdit}
+          >
+            ✏️ Измени
+          </button>
+
+          <button
+            className="btn-ghost"
+            style={{
+              fontSize: 12,
+              color: "#ef4444",
+              borderColor: "#fca5a5",
+            }}
+            onClick={onDelete}
+          >
+            🗑 Избриши
           </button>
         </div>
       </div>
